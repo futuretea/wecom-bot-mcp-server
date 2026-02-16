@@ -3,7 +3,7 @@ module github.com/futuretea/wecom-bot-mcp-server
 go 1.24.1
 
 require (
-	github.com/futuretea/go-wecom-bot v0.1.1
+	github.com/futuretea/go-wecom-bot v0.0.1
 	github.com/mark3labs/mcp-go v0.41.1
 	github.com/rs/zerolog v1.33.0
 	github.com/spf13/cobra v1.10.1
@@ -42,5 +42,3 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/futuretea/go-wecom-bot => ../go-wecom-bot

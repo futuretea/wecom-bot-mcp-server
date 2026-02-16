@@ -14,6 +14,8 @@ github.com/fsnotify/fsnotify v1.7.0 h1:8JEhPFa5W2WU7YfeZzPNqzMP6Lwt7L2715Ggo0nos
 github.com/fsnotify/fsnotify v1.7.0/go.mod h1:40Bi/Hjc2AVfZrqy+aj+yEI+/bRxZnMJyTJwOpGvigM=
 github.com/futuretea/go-http-client v0.0.2 h1:MtdYSwj5RzeXoRR+TJbdPfOWwYafrxbKl6FT8T7Vaxw=
 github.com/futuretea/go-http-client v0.0.2/go.mod h1:QFXWNOvw6xEl1ztfTYSaJDqUCArH9cABQ0CziFmMOqM=
+github.com/futuretea/go-wecom-bot v0.0.1 h1:hz4mdoGkpVJA4lDMTyzhjZWqffFr4cm5+ZQfrniszm4=
+github.com/futuretea/go-wecom-bot v0.0.1/go.mod h1:dV9jJCdjJyN/+xor/jEPpHTm2mV0Db03RwjQT83lt8I=
 github.com/godbus/dbus/v5 v5.0.4/go.mod h1:xhWf0FNVPg57R7Z0UbKHbJfkEywrmjJnf7w5xrFpKfA=
 github.com/google/go-cmp v0.5.9 h1:O2Tfq5qg4qc4AmwVlvv0oLiVAGB7enBSJ2x2DqQFi38=
 github.com/google/go-cmp v0.5.9/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
