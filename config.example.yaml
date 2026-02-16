@@ -1,0 +1,35 @@
+# WeCom Bot MCP Server Configuration Example
+#
+# Configuration Priority (highest to lowest):
+# 1. Command-line flags: --port=8080 --wecom-bot-key=...
+# 2. Environment variables: WECOM_MCP_PORT=8080 WECOM_MCP_WECOM_BOT_KEY=...
+# 3. Configuration file: config.yaml
+# 4. Default values
+#
+# Environment Variable Format:
+# - Prefix: WECOM_MCP_
+# - Field name conversion: Replace hyphens and dots with underscores
+# - Examples:
+#   WECOM_MCP_PORT=8080
+#   WECOM_MCP_SSE_BASE_URL=https://example.com
+#   WECOM_MCP_WECOM_BOT_KEY=your-bot-key
+#   WECOM_MCP_LOG_LEVEL=5
+
+# Server configuration
+port: 0  # 0 means stdio mode for MCP client integration
+# For HTTP/SSE mode, set a port like 8080
+# port: 8080
+
+# SSE (Server-Sent Events) configuration
+# sse_base_url: https://your-domain.com:8080  # Public base URL for SSE endpoint
+
+log_level: 5  # Log level 0-9 (default: 5, Info)
+
+# WeCom Bot configuration
+# Get the key from your WeCom bot webhook URL:
+# https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=YOUR_KEY_HERE
+wecom_bot_key: your-bot-key-here
+
+# Tool enable/disable configuration
+enabled_tools: []  # Enable specific tools (empty means all enabled)
+disabled_tools: []  # Disable specific tools
