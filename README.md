@@ -12,13 +12,13 @@
 A [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server for [WeCom (WeChat Work)](https://work.weixin.qq.com/) bot webhooks.
 
 - **Text Messages**: Send plain text with @mention support (by user ID or mobile number)
-- **Markdown Messages**: Send rich formatted messages using Markdown syntax
+- **Markdown Messages**: Send Markdown-formatted messages (headings, bold, links, quotes, etc.)
 - **Image Messages**: Send base64-encoded images (JPG/PNG, up to 2MB)
 - **News Messages**: Send article list cards (1–8 articles with title, description, URL, cover image)
-- **Template Cards**: Send text notice and news notice template cards with emphasis content, key-value lists, jump links, and card actions
-- **File Upload**: Upload files to WeCom server (up to 20MB) and obtain `media_id`
-- **Dual Transport**: Stdio mode for MCP client integration or HTTP/SSE mode for network access
-- **Cross-platform**: Native binaries for Linux, macOS, Windows (amd64/arm64), npm package, and Docker images
+- **Template Cards**: Send text notice and news notice template cards with highlighted content, key-value pairs, links, and click actions
+- **File Upload**: Upload files to WeCom server (up to 20MB) and get back a `media_id`
+- **Dual Transport**: Runs in stdio mode (for MCP client integration) or HTTP/SSE mode (for network access)
+- **Cross-platform**: Available as native binaries (Linux, macOS, Windows — amd64/arm64), an npm package, or Docker images
 
 ## Getting Started <a id="getting-started"></a>
 
@@ -151,7 +151,7 @@ Use `--enabled-tools` / `--disabled-tools` for fine-grained control.
 <details>
 <summary>send_text</summary>
 
-Send a text message via WeCom bot webhook. Supports @mentioning users by user ID or mobile number.
+Send a text message through a WeCom bot webhook. Supports @mentioning users by ID or mobile number.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
@@ -174,7 +174,7 @@ Send a text message via WeCom bot webhook. Supports @mentioning users by user ID
 <details>
 <summary>send_markdown</summary>
 
-Send a markdown message via WeCom bot webhook. Supports headings, bold, links, quotes, and more.
+Send a Markdown message through a WeCom bot webhook. Supports headings, bold, links, quotes, etc.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
@@ -193,7 +193,7 @@ Send a markdown message via WeCom bot webhook. Supports headings, bold, links, q
 <details>
 <summary>send_image</summary>
 
-Send an image message via WeCom bot webhook using base64-encoded image data.
+Send an image (JPG/PNG, base64-encoded) through a WeCom bot webhook.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
@@ -214,7 +214,7 @@ Send an image message via WeCom bot webhook using base64-encoded image data.
 <details>
 <summary>send_news</summary>
 
-Send a news (article list) message via WeCom bot webhook. Supports 1–8 articles.
+Send a news message (article list) through a WeCom bot webhook. Accepts 1–8 articles.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
@@ -244,7 +244,7 @@ Send a news (article list) message via WeCom bot webhook. Supports 1–8 article
 <details>
 <summary>send_text_notice_card</summary>
 
-Send a text notice template card via WeCom bot webhook. Rich card layout with emphasis content, key-value list, and jump links.
+Send a text notice template card through a WeCom bot webhook. Supports highlighted content, key-value pairs, and links.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
@@ -298,7 +298,7 @@ Send a text notice template card via WeCom bot webhook. Rich card layout with em
 <details>
 <summary>send_news_notice_card</summary>
 
-Send a news notice template card via WeCom bot webhook. Card layout with a large cover image.
+Send a news notice template card with a cover image through a WeCom bot webhook.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
@@ -333,7 +333,7 @@ Send a news notice template card via WeCom bot webhook. Card layout with a large
 <details>
 <summary>upload_file</summary>
 
-Upload a file to WeCom server via bot webhook. Returns a `media_id` that can be used to send file messages.
+Upload a file to the WeCom server (up to 20MB). Returns a `media_id` you can use to send file messages.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
@@ -379,7 +379,7 @@ npx @modelcontextprotocol/inspector@latest -- npx @futuretea/wecom-bot-mcp-serve
 
 ## Contributing
 
-Contributions are welcome! Please open an issue or pull request on [GitHub](https://github.com/futuretea/wecom-bot-mcp-server).
+Found a bug or have an idea? Open an issue or send a pull request on [GitHub](https://github.com/futuretea/wecom-bot-mcp-server).
 
 ## License
 

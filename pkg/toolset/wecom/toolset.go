@@ -24,7 +24,7 @@ func (t *Toolset) GetTools(_ any) []toolset.ServerTool {
 	return []toolset.ServerTool{
 		{
 			Tool: mcp.NewTool("send_text",
-				mcp.WithDescription("Send a text message via WeCom bot webhook. Supports @mentioning users by user ID or mobile number."),
+				mcp.WithDescription("Send a text message through a WeCom bot webhook. Supports @mentioning users by ID or mobile number."),
 				mcp.WithString("content",
 					mcp.Required(),
 					mcp.Description("The text content to send. Maximum 2048 bytes."),
@@ -42,7 +42,7 @@ func (t *Toolset) GetTools(_ any) []toolset.ServerTool {
 		},
 		{
 			Tool: mcp.NewTool("send_markdown",
-				mcp.WithDescription("Send a markdown message via WeCom bot webhook. Supports headings, bold, links, quotes, and more."),
+				mcp.WithDescription("Send a Markdown message through a WeCom bot webhook. Supports headings, bold, links, quotes, etc."),
 				mcp.WithString("content",
 					mcp.Required(),
 					mcp.Description("The markdown content to send. Maximum 4096 bytes."),
@@ -52,7 +52,7 @@ func (t *Toolset) GetTools(_ any) []toolset.ServerTool {
 		},
 		{
 			Tool: mcp.NewTool("send_image",
-				mcp.WithDescription("Send an image message via WeCom bot webhook using base64-encoded image data."),
+				mcp.WithDescription("Send an image (JPG/PNG, base64-encoded) through a WeCom bot webhook."),
 				mcp.WithString("base64",
 					mcp.Required(),
 					mcp.Description("Base64-encoded image content. Max image size: 2MB. Supported formats: JPG, PNG."),
@@ -66,7 +66,7 @@ func (t *Toolset) GetTools(_ any) []toolset.ServerTool {
 		},
 		{
 			Tool: mcp.NewTool("send_news",
-				mcp.WithDescription("Send a news (article list) message via WeCom bot webhook. Supports 1-8 articles."),
+				mcp.WithDescription("Send a news message (article list) through a WeCom bot webhook. Accepts 1-8 articles."),
 				mcp.WithArray("articles",
 					mcp.Required(),
 					mcp.Description("Array of news articles (1-8 items)."),
@@ -98,7 +98,7 @@ func (t *Toolset) GetTools(_ any) []toolset.ServerTool {
 		},
 		{
 			Tool: mcp.NewTool("send_text_notice_card",
-				mcp.WithDescription("Send a text notice template card via WeCom bot webhook. Rich card layout with emphasis content, key-value list, and jump links."),
+				mcp.WithDescription("Send a text notice template card through a WeCom bot webhook. Supports highlighted content, key-value pairs, and links."),
 				mcp.WithString("main_title",
 					mcp.Required(),
 					mcp.Description("Main title of the card."),
@@ -184,7 +184,7 @@ func (t *Toolset) GetTools(_ any) []toolset.ServerTool {
 		},
 		{
 			Tool: mcp.NewTool("send_news_notice_card",
-				mcp.WithDescription("Send a news notice template card via WeCom bot webhook. Card layout with a large cover image."),
+				mcp.WithDescription("Send a news notice template card with a cover image through a WeCom bot webhook."),
 				mcp.WithString("main_title",
 					mcp.Required(),
 					mcp.Description("Main title of the card."),
@@ -224,7 +224,7 @@ func (t *Toolset) GetTools(_ any) []toolset.ServerTool {
 		},
 		{
 			Tool: mcp.NewTool("upload_file",
-				mcp.WithDescription("Upload a file to WeCom server via bot webhook. Returns a media_id that can be used to send file messages."),
+				mcp.WithDescription("Upload a file to the WeCom server (up to 20MB). Returns a media_id you can use to send file messages."),
 				mcp.WithString("filename",
 					mcp.Required(),
 					mcp.Description("Name of the file to upload."),

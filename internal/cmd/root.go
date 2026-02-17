@@ -49,12 +49,11 @@ func NewMCPServer(streams IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "wecom-bot-mcp-server",
 		Short: "WeCom Bot MCP Server - Model Context Protocol server for WeCom (WeChat Work) bot messaging",
-		Long: `WeCom Bot MCP Server is a Model Context Protocol (MCP) server that provides
-WeCom (WeChat Work) bot messaging capabilities through the MCP protocol.
+		Long: `An MCP server for sending messages through WeCom (WeChat Work) bot webhooks.
 
-This server can run in stdio mode for integration with MCP clients or in HTTP mode
-for network access. It supports sending text, markdown, image, news, and template
-card messages via WeCom bot webhooks.`,
+Runs in stdio mode for direct MCP client integration, or in HTTP/SSE mode
+for network access. Supports text, Markdown, image, news, and template card
+messages.`,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
