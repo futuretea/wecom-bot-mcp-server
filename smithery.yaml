@@ -6,6 +6,8 @@ startCommand:
   commandFunction:
     |-
     (config) => ({
-      "command": "wecom-bot-mcp-server",
-      "args": []
+      "command": "npx",
+      "args": [
+        "-y", "@futuretea/wecom-bot-mcp-server@latest"
+      ]
     })

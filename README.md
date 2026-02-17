@@ -2,6 +2,7 @@
 
 [![Build](https://github.com/futuretea/wecom-bot-mcp-server/actions/workflows/build.yaml/badge.svg)](https://github.com/futuretea/wecom-bot-mcp-server/actions/workflows/build.yaml)
 [![GitHub License](https://img.shields.io/github/license/futuretea/wecom-bot-mcp-server)](https://github.com/futuretea/wecom-bot-mcp-server/blob/main/LICENSE)
+[![npm](https://img.shields.io/npm/v/@futuretea/wecom-bot-mcp-server)](https://www.npmjs.com/package/@futuretea/wecom-bot-mcp-server)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/futuretea/wecom-bot-mcp-server?sort=semver)](https://github.com/futuretea/wecom-bot-mcp-server/releases/latest)
 
 [Features](#features) | [Getting Started](#getting-started) | [Configuration](#configuration) | [Tools](#tools) | [Development](#development)
@@ -17,7 +18,7 @@ A [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server for [W
 - **Template Cards**: Send text notice and news notice template cards with emphasis content, key-value lists, jump links, and card actions
 - **File Upload**: Upload files to WeCom server (up to 20MB) and obtain `media_id`
 - **Dual Transport**: Stdio mode for MCP client integration or HTTP/SSE mode for network access
-- **Cross-platform**: Native binaries for Linux (amd64/arm64), macOS (amd64/arm64), and Docker images
+- **Cross-platform**: Native binaries for Linux, macOS, Windows (amd64/arm64), npm package, and Docker images
 
 ## Getting Started <a id="getting-started"></a>
 
@@ -28,8 +29,7 @@ A [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server for [W
 ### Claude Code
 
 ```shell
-claude mcp add wecom-bot -- \
-  /path/to/wecom-bot-mcp-server \
+claude mcp add wecom-bot -- npx @futuretea/wecom-bot-mcp-server@latest \
   --wecom-bot-key YOUR_KEY
 ```
 
@@ -41,8 +41,10 @@ Add to `.vscode/mcp.json` or `~/.cursor/mcp.json`:
 {
   "servers": {
     "wecom-bot": {
-      "command": "/path/to/wecom-bot-mcp-server",
+      "command": "npx",
       "args": [
+        "-y",
+        "@futuretea/wecom-bot-mcp-server@latest",
         "--wecom-bot-key",
         "YOUR_KEY"
       ]
@@ -53,9 +55,18 @@ Add to `.vscode/mcp.json` or `~/.cursor/mcp.json`:
 
 ### Docker
 
+Stdio mode:
+
 ```shell
 docker run --rm -i ghcr.io/futuretea/wecom-bot-mcp-server:latest \
   --wecom-bot-key YOUR_KEY
+```
+
+HTTP/SSE mode:
+
+```shell
+docker run --rm -p 8080:8080 ghcr.io/futuretea/wecom-bot-mcp-server:latest \
+  --port 8080 --wecom-bot-key YOUR_KEY
 ```
 
 ## Configuration <a id="configuration"></a>
@@ -71,7 +82,7 @@ Configuration can be set via CLI flags, environment variables, or a config file.
 ### CLI Options
 
 ```shell
-wecom-bot-mcp-server --help
+npx @futuretea/wecom-bot-mcp-server@latest --help
 ```
 
 | Option | Description | Default |
@@ -363,7 +374,7 @@ make lint
 ### Run with mcp-inspector
 
 ```shell
-npx @modelcontextprotocol/inspector@latest $(pwd)/wecom-bot-mcp-server
+npx @modelcontextprotocol/inspector@latest -- npx @futuretea/wecom-bot-mcp-server@latest
 ```
 
 ## Contributing

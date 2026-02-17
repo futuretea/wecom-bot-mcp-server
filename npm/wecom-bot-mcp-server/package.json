@@ -1,0 +1,40 @@
+{
+  "name": "@futuretea/wecom-bot-mcp-server",
+  "version": "0.0.0",
+  "description": "Model Context Protocol (MCP) server for WeCom Bot message sending",
+  "main": "./bin/index.js",
+  "bin": {
+    "wecom-bot-mcp-server": "bin/index.js"
+  },
+  "optionalDependencies": {
+    "@futuretea/wecom-bot-mcp-server-darwin-amd64": "0.0.0",
+    "@futuretea/wecom-bot-mcp-server-darwin-arm64": "0.0.0",
+    "@futuretea/wecom-bot-mcp-server-linux-amd64": "0.0.0",
+    "@futuretea/wecom-bot-mcp-server-linux-arm64": "0.0.0",
+    "@futuretea/wecom-bot-mcp-server-windows-amd64": "0.0.0",
+    "@futuretea/wecom-bot-mcp-server-windows-arm64": "0.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/futuretea/wecom-bot-mcp-server.git"
+  },
+  "keywords": [
+    "mcp",
+    "wecom",
+    "bot",
+    "wechat",
+    "model context protocol",
+    "model",
+    "context",
+    "protocol"
+  ],
+  "author": {
+    "name": "futuretea",
+    "url": "https://github.com/futuretea"
+  },
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/futuretea/wecom-bot-mcp-server/issues"
+  },
+  "homepage": "https://github.com/futuretea/wecom-bot-mcp-server#readme"
+}

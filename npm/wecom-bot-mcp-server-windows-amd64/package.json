@@ -1,0 +1,11 @@
+{
+  "name": "@futuretea/wecom-bot-mcp-server-windows-amd64",
+  "version": "0.0.0",
+  "description": "WeCom Bot MCP Server binary for windows/amd64",
+  "os": [
+    "win32"
+  ],
+  "cpu": [
+    "x64"
+  ]
+}
