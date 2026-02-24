@@ -2,12 +2,19 @@
 startCommand:
   type: stdio
   configSchema:
-    {}
+    type: object
+    required:
+      - wecom_bot_key
+    properties:
+      wecom_bot_key:
+        type: string
+        description: "WeCom bot webhook key"
   commandFunction:
     |-
     (config) => ({
       "command": "npx",
       "args": [
-        "-y", "@futuretea/wecom-bot-mcp-server@latest"
+        "-y", "@futuretea/wecom-bot-mcp-server@latest",
+        "--wecom-bot-key", config.wecom_bot_key
       ]
     })

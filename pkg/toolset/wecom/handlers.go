@@ -12,6 +12,17 @@ import (
 	"github.com/futuretea/go-wecom-bot/text"
 )
 
+// WeCom API limits
+const (
+	maxTextContentBytes     = 2048
+	maxMarkdownContentBytes = 4096
+	maxNewsArticles         = 8
+	maxUploadFileBytes      = 20 * 1024 * 1024 // 20MB
+
+	// defaultCardImageAspectRatio is the default aspect ratio for news notice card images.
+	defaultCardImageAspectRatio = 2.35
+)
+
 // getBot validates and returns the WeCom bot client from the generic client.
 func getBot(client any) (*wecombot.Bot, error) {
 	bot, ok := client.(*wecombot.Bot)
@@ -118,6 +129,9 @@ func handleSendText(client any, params map[string]any) (string, error) {
 	if content == "" {
 		return "", fmt.Errorf("content is required")
 	}
+	if len(content) > maxTextContentBytes {
+		return "", fmt.Errorf("content exceeds maximum size of %d bytes", maxTextContentBytes)
+	}
 
 	msg := text.New(content)
 
@@ -146,6 +160,9 @@ func handleSendMarkdown(client any, params map[string]any) (string, error) {
 	content := stringParam(params, "content")
 	if content == "" {
 		return "", fmt.Errorf("content is required")
+	}
+	if len(content) > maxMarkdownContentBytes {
+		return "", fmt.Errorf("content exceeds maximum size of %d bytes", maxMarkdownContentBytes)
 	}
 
 	msg := markdown.New(content)
@@ -192,6 +209,9 @@ func handleSendNews(client any, params map[string]any) (string, error) {
 	if len(articles) == 0 {
 		return "", fmt.Errorf("articles is required and must not be empty")
 	}
+	if len(articles) > maxNewsArticles {
+		return "", fmt.Errorf("articles must not exceed %d items, got %d", maxNewsArticles, len(articles))
+	}
 
 	msg := news.New()
 	for _, article := range articles {
@@ -229,6 +249,7 @@ func handleSendTextNoticeCard(client any, params map[string]any) (string, error)
 		WithMainTitle(mainTitle, stringParam(params, "main_title_desc"))
 
 	if iconURL, desc, ok := parseSource(params); ok {
+		// Use blue for text notice cards as a default visual distinction
 		card.WithSource(iconURL, desc, templatecard.SourceDescColorBlue)
 	}
 
@@ -280,9 +301,10 @@ func handleSendNewsNoticeCard(client any, params map[string]any) (string, error)
 
 	card := templatecard.NewNewsNotice().
 		WithMainTitle(mainTitle, stringParam(params, "main_title_desc")).
-		WithCardImage(cardImageURL, 2.35)
+		WithCardImage(cardImageURL, defaultCardImageAspectRatio)
 
 	if iconURL, desc, ok := parseSource(params); ok {
+		// Use green for news notice cards as a default visual distinction
 		card.WithSource(iconURL, desc, templatecard.SourceDescColorGreen)
 	}
 
@@ -320,6 +342,9 @@ func handleUploadFile(client any, params map[string]any) (string, error) {
 	data, err := base64.StdEncoding.DecodeString(base64Data)
 	if err != nil {
 		return "", fmt.Errorf("failed to decode base64 data: %w", err)
+	}
+	if len(data) > maxUploadFileBytes {
+		return "", fmt.Errorf("file size exceeds maximum of %d bytes", maxUploadFileBytes)
 	}
 
 	media, err := bot.UploadMedia(filename, data)

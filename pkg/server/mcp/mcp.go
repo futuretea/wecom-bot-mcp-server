@@ -2,7 +2,6 @@ package mcp
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	wecombot "github.com/futuretea/go-wecom-bot"
@@ -42,15 +41,13 @@ func NewServer(cfg *config.StaticConfig) (*Server, error) {
 	}
 
 	// Register tools
-	if err := s.registerTools(); err != nil {
-		return nil, err
-	}
+	s.registerTools()
 
 	return s, nil
 }
 
 // registerTools registers all available tools based on configuration
-func (s *Server) registerTools() error {
+func (s *Server) registerTools() {
 	wecomToolset := &wecomToolset.Toolset{}
 	tools := wecomToolset.GetTools(s.bot)
 
@@ -58,13 +55,10 @@ func (s *Server) registerTools() error {
 		if !s.isToolEnabled(tool.Tool.Name) {
 			continue
 		}
-		if err := s.registerTool(tool); err != nil {
-			return fmt.Errorf("failed to register tool %s: %w", tool.Tool.Name, err)
-		}
+		s.registerTool(tool)
 	}
 
 	logging.Info("MCP server initialized with %d tools", len(s.enabledTools))
-	return nil
 }
 
 // isToolEnabled determines if a tool should be enabled based on configuration
@@ -91,13 +85,12 @@ func (s *Server) isToolEnabled(toolName string) bool {
 }
 
 // registerTool registers a single tool with the MCP server
-func (s *Server) registerTool(tool toolset.ServerTool) error {
+func (s *Server) registerTool(tool toolset.ServerTool) {
 	handler := s.createToolHandler(tool)
 	s.server.AddTool(tool.Tool, handler)
 	s.enabledTools = append(s.enabledTools, tool.Tool.Name)
 
 	logging.Info("Registered tool: %s", tool.Tool.Name)
-	return nil
 }
 
 // createToolHandler creates the handler function for a tool
@@ -115,6 +108,7 @@ func (s *Server) createToolHandler(tool toolset.ServerTool) server.ToolHandlerFu
 func extractParams(args any) map[string]any {
 	params, ok := args.(map[string]any)
 	if !ok {
+		logging.Warn("unexpected argument type %T, expected map[string]any", args)
 		return make(map[string]any)
 	}
 	return params

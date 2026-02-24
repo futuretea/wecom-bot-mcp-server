@@ -25,7 +25,7 @@ const child = childProcess.spawn(resolveBinaryPath(), process.argv.slice(2), {
   stdio: 'inherit',
 });
 
-const handleSignal = () => (signal) => {
+const handleSignal = (signal) => {
   console.log(`Received ${signal}, terminating child process...`);
   if (child && !child.killed) {
     child.kill(signal);
@@ -33,7 +33,7 @@ const handleSignal = () => (signal) => {
 };
 
 ['SIGTERM', 'SIGINT', 'SIGHUP'].forEach((signal) => {
-  process.on(signal, handleSignal(signal));
+  process.on(signal, handleSignal);
 });
 
 child.on('close', (code, signal) => {

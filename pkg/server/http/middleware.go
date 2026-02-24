@@ -45,6 +45,8 @@ func (lrw *loggingResponseWriter) WriteHeader(code int) {
 	lrw.ResponseWriter.WriteHeader(code)
 }
 
+// Write writes the response body data. If WriteHeader has not been called yet,
+// it implicitly sets the status to 200 OK, matching net/http stdlib behavior.
 func (lrw *loggingResponseWriter) Write(b []byte) (int, error) {
 	lrw.WriteHeader(http.StatusOK)
 	return lrw.ResponseWriter.Write(b)

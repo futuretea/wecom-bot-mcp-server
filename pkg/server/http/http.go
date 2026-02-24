@@ -30,6 +30,8 @@ func formatAddress(port int) string {
 	return ":" + strconv.Itoa(port)
 }
 
+// Serve starts the MCP HTTP/SSE server with the given configuration,
+// handling graceful shutdown on SIGINT, SIGHUP, and SIGTERM.
 func Serve(ctx context.Context, mcpServer *mcp.Server, cfg *config.StaticConfig) error {
 	mux := http.NewServeMux()
 	wrappedMux := RequestMiddleware(mux)

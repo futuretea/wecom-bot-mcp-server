@@ -12,8 +12,16 @@ RUN go mod download
 # Copy source code
 COPY . .
 
-# Build the binary
-RUN CGO_ENABLED=0 go build -o wecom-bot-mcp-server ./cmd/wecom-bot-mcp-server
+# Build the binary with version info
+ARG VERSION=dev
+ARG GIT_COMMIT=unknown
+ARG BUILD_DATE=unknown
+RUN CGO_ENABLED=0 go build \
+    -ldflags "-s -w \
+      -X 'github.com/futuretea/wecom-bot-mcp-server/pkg/core/version.Version=${VERSION}' \
+      -X 'github.com/futuretea/wecom-bot-mcp-server/pkg/core/version.GitCommit=${GIT_COMMIT}' \
+      -X 'github.com/futuretea/wecom-bot-mcp-server/pkg/core/version.BuildDate=${BUILD_DATE}'" \
+    -o wecom-bot-mcp-server ./cmd/wecom-bot-mcp-server
 
 # Final stage
 FROM cgr.dev/chainguard/wolfi-base:latest AS runtime
