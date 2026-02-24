@@ -80,11 +80,3 @@ func LoadConfig(configPath string) (*StaticConfig, error) {
 
 	return config, nil
 }
-
-// GetPortString returns the port as a string in the format ":port"
-func (c *StaticConfig) GetPortString() string {
-	if c.Port == 0 {
-		return ""
-	}
-	return fmt.Sprintf(":%d", c.Port)
-}

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
@@ -21,17 +22,25 @@ const (
 	sseMessageEndpoint = "/message"
 )
 
-func Serve(ctx context.Context, mcpServer *mcp.Server, staticConfig *config.StaticConfig) error {
-	mux := http.NewServeMux()
+// formatAddress returns the port as an address string in the format ":port"
+func formatAddress(port int) string {
+	if port == 0 {
+		return ""
+	}
+	return ":" + strconv.Itoa(port)
+}
 
+func Serve(ctx context.Context, mcpServer *mcp.Server, cfg *config.StaticConfig) error {
+	mux := http.NewServeMux()
 	wrappedMux := RequestMiddleware(mux)
 
+	addr := formatAddress(cfg.Port)
 	httpServer := &http.Server{
-		Addr:    staticConfig.GetPortString(),
+		Addr:    addr,
 		Handler: wrappedMux,
 	}
 
-	sseServer := mcpServer.ServeSse(staticConfig.SSEBaseURL, httpServer)
+	sseServer := mcpServer.ServeSse(cfg.SSEBaseURL, httpServer)
 	streamableHttpServer := mcpServer.ServeHTTP(httpServer)
 	mux.Handle(sseEndpoint, sseServer)
 	mux.Handle(sseMessageEndpoint, sseServer)
@@ -54,7 +63,7 @@ func Serve(ctx context.Context, mcpServer *mcp.Server, staticConfig *config.Stat
 
 	serverErr := make(chan error, 1)
 	go func() {
-		logging.Info("Streaming and SSE HTTP servers starting on port %s and paths /mcp, /sse, /message", staticConfig.GetPortString())
+		logging.Info("Streaming and SSE HTTP servers starting on port %s and paths /mcp, /sse, /message", addr)
 		if err := httpServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			serverErr <- err
 		}

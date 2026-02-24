@@ -6,6 +6,9 @@ import (
 	"github.com/futuretea/wecom-bot-mcp-server/pkg/toolset"
 )
 
+// Compile-time interface check
+var _ toolset.Toolset = (*Toolset)(nil)
+
 // Toolset provides WeCom bot messaging tools.
 type Toolset struct{}
 

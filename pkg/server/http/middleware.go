@@ -37,18 +37,16 @@ type loggingResponseWriter struct {
 }
 
 func (lrw *loggingResponseWriter) WriteHeader(code int) {
-	if !lrw.headerWritten {
-		lrw.statusCode = code
-		lrw.headerWritten = true
-		lrw.ResponseWriter.WriteHeader(code)
+	if lrw.headerWritten {
+		return
 	}
+	lrw.statusCode = code
+	lrw.headerWritten = true
+	lrw.ResponseWriter.WriteHeader(code)
 }
 
 func (lrw *loggingResponseWriter) Write(b []byte) (int, error) {
-	if !lrw.headerWritten {
-		lrw.statusCode = http.StatusOK
-		lrw.headerWritten = true
-	}
+	lrw.WriteHeader(http.StatusOK)
 	return lrw.ResponseWriter.Write(b)
 }
 

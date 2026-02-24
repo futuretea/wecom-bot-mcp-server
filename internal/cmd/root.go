@@ -107,13 +107,8 @@ func runServer(cfgFile string, streams IOStreams) error {
 		logging.Initialize(cfg.LogLevel, streams.ErrOut)
 	}
 
-	// Create MCP server configuration
-	mcpConfig := mcp.Configuration{
-		StaticConfig: cfg,
-	}
-
 	// Create MCP server
-	server, err := mcp.NewServer(mcpConfig)
+	server, err := mcp.NewServer(cfg)
 	if err != nil {
 		return fmt.Errorf("failed to create MCP server: %w", err)
 	}

@@ -16,34 +16,34 @@ import (
 func getBot(client any) (*wecombot.Bot, error) {
 	bot, ok := client.(*wecombot.Bot)
 	if !ok || bot == nil {
-		return nil, fmt.Errorf("WeCom bot client is not configured")
+		return nil, fmt.Errorf("weCom bot client is not configured")
 	}
 	return bot, nil
 }
 
-// getStringParam extracts a string parameter from the map.
-func getStringParam(m map[string]any, key string) string {
-	v, ok := m[key]
-	if !ok {
+// stringParam extracts a string parameter from the params map.
+func stringParam(params map[string]any, key string) string {
+	value, exists := params[key]
+	if !exists {
 		return ""
 	}
-	s, _ := v.(string)
-	return s
+	str, _ := value.(string)
+	return str
 }
 
-// getStringSliceParam extracts a string slice parameter from the map.
-func getStringSliceParam(m map[string]any, key string) []string {
-	v, ok := m[key]
-	if !ok {
+// stringSliceParam extracts a string slice parameter from the params map.
+func stringSliceParam(params map[string]any, key string) []string {
+	value, exists := params[key]
+	if !exists {
 		return nil
 	}
 
-	switch arr := v.(type) {
+	switch arr := value.(type) {
 	case []any:
 		result := make([]string, 0, len(arr))
 		for _, item := range arr {
-			if s, ok := item.(string); ok {
-				result = append(result, s)
+			if str, ok := item.(string); ok {
+				result = append(result, str)
 			}
 		}
 		return result
@@ -54,14 +54,14 @@ func getStringSliceParam(m map[string]any, key string) []string {
 	}
 }
 
-// getMapSliceParam extracts a slice of maps from the map.
-func getMapSliceParam(m map[string]any, key string) []map[string]any {
-	v, ok := m[key]
-	if !ok {
+// mapSliceParam extracts a slice of maps from the params map.
+func mapSliceParam(params map[string]any, key string) []map[string]any {
+	value, exists := params[key]
+	if !exists {
 		return nil
 	}
 
-	arr, ok := v.([]any)
+	arr, ok := value.([]any)
 	if !ok {
 		return nil
 	}
@@ -75,32 +75,32 @@ func getMapSliceParam(m map[string]any, key string) []map[string]any {
 	return result
 }
 
-// getMapParam extracts a map parameter from the map.
-func getMapParam(m map[string]any, key string) map[string]any {
-	v, ok := m[key]
-	if !ok {
+// mapParam extracts a map parameter from the params map.
+func mapParam(params map[string]any, key string) map[string]any {
+	value, exists := params[key]
+	if !exists {
 		return nil
 	}
-	sub, _ := v.(map[string]any)
-	return sub
+	m, _ := value.(map[string]any)
+	return m
 }
 
 // parseSource extracts source fields (icon_url, desc) from the "source" param.
 func parseSource(params map[string]any) (iconURL, desc string, ok bool) {
-	source := getMapParam(params, "source")
+	source := mapParam(params, "source")
 	if source == nil {
 		return "", "", false
 	}
-	return getStringParam(source, "icon_url"), getStringParam(source, "desc"), true
+	return stringParam(source, "icon_url"), stringParam(source, "desc"), true
 }
 
 // parseCardActionURL extracts and validates the card_action.url from params.
 func parseCardActionURL(params map[string]any) (string, error) {
-	cardAction := getMapParam(params, "card_action")
+	cardAction := mapParam(params, "card_action")
 	if cardAction == nil {
 		return "", fmt.Errorf("card_action is required")
 	}
-	url := getStringParam(cardAction, "url")
+	url := stringParam(cardAction, "url")
 	if url == "" {
 		return "", fmt.Errorf("card_action.url is required")
 	}
@@ -114,7 +114,7 @@ func handleSendText(client any, params map[string]any) (string, error) {
 		return "", err
 	}
 
-	content := getStringParam(params, "content")
+	content := stringParam(params, "content")
 	if content == "" {
 		return "", fmt.Errorf("content is required")
 	}
@@ -122,10 +122,10 @@ func handleSendText(client any, params map[string]any) (string, error) {
 	msg := text.New(content)
 
 	// Add mentions if specified
-	if mentionedList := getStringSliceParam(params, "mentioned_list"); len(mentionedList) > 0 {
+	if mentionedList := stringSliceParam(params, "mentioned_list"); len(mentionedList) > 0 {
 		msg.WithMention(mentionedList...)
 	}
-	if mentionedMobileList := getStringSliceParam(params, "mentioned_mobile_list"); len(mentionedMobileList) > 0 {
+	if mentionedMobileList := stringSliceParam(params, "mentioned_mobile_list"); len(mentionedMobileList) > 0 {
 		msg.WithMentionMobile(mentionedMobileList...)
 	}
 
@@ -143,7 +143,7 @@ func handleSendMarkdown(client any, params map[string]any) (string, error) {
 		return "", err
 	}
 
-	content := getStringParam(params, "content")
+	content := stringParam(params, "content")
 	if content == "" {
 		return "", fmt.Errorf("content is required")
 	}
@@ -163,17 +163,17 @@ func handleSendImage(client any, params map[string]any) (string, error) {
 		return "", err
 	}
 
-	b64 := getStringParam(params, "base64")
-	if b64 == "" {
+	encodedImage := stringParam(params, "base64")
+	if encodedImage == "" {
 		return "", fmt.Errorf("base64 is required")
 	}
 
-	md5Hash := getStringParam(params, "md5")
+	md5Hash := stringParam(params, "md5")
 	if md5Hash == "" {
 		return "", fmt.Errorf("md5 is required")
 	}
 
-	msg := image.New(b64, md5Hash)
+	msg := image.New(encodedImage, md5Hash)
 	if err := bot.Send(msg); err != nil {
 		return "", fmt.Errorf("failed to send image message: %w", err)
 	}
@@ -188,22 +188,22 @@ func handleSendNews(client any, params map[string]any) (string, error) {
 		return "", err
 	}
 
-	articles := getMapSliceParam(params, "articles")
+	articles := mapSliceParam(params, "articles")
 	if len(articles) == 0 {
 		return "", fmt.Errorf("articles is required and must not be empty")
 	}
 
 	msg := news.New()
 	for _, article := range articles {
-		title := getStringParam(article, "title")
+		title := stringParam(article, "title")
 		if title == "" {
 			return "", fmt.Errorf("each article must have a title")
 		}
-		url := getStringParam(article, "url")
+		url := stringParam(article, "url")
 		if url == "" {
 			return "", fmt.Errorf("each article must have a url")
 		}
-		msg.AddArticle(title, getStringParam(article, "description"), url, getStringParam(article, "picurl"))
+		msg.AddArticle(title, stringParam(article, "description"), url, stringParam(article, "picurl"))
 	}
 
 	if err := bot.Send(msg); err != nil {
@@ -220,32 +220,32 @@ func handleSendTextNoticeCard(client any, params map[string]any) (string, error)
 		return "", err
 	}
 
-	mainTitle := getStringParam(params, "main_title")
+	mainTitle := stringParam(params, "main_title")
 	if mainTitle == "" {
 		return "", fmt.Errorf("main_title is required")
 	}
 
 	card := templatecard.NewTextNotice().
-		WithMainTitle(mainTitle, getStringParam(params, "main_title_desc"))
+		WithMainTitle(mainTitle, stringParam(params, "main_title_desc"))
 
 	if iconURL, desc, ok := parseSource(params); ok {
 		card.WithSource(iconURL, desc, templatecard.SourceDescColorBlue)
 	}
 
-	if subTitle := getStringParam(params, "sub_title"); subTitle != "" {
+	if subTitle := stringParam(params, "sub_title"); subTitle != "" {
 		card.WithSubTitle(subTitle)
 	}
 
-	if emphasis := getMapParam(params, "emphasis_content"); emphasis != nil {
-		card.WithEmphasisContent(getStringParam(emphasis, "title"), getStringParam(emphasis, "desc"))
+	if emphasis := mapParam(params, "emphasis_content"); emphasis != nil {
+		card.WithEmphasisContent(stringParam(emphasis, "title"), stringParam(emphasis, "desc"))
 	}
 
-	for _, hc := range getMapSliceParam(params, "horizontal_content_list") {
-		card.AddHorizontalContent(getStringParam(hc, "keyname"), getStringParam(hc, "value"), templatecard.HorizontalContentTypeText)
+	for _, content := range mapSliceParam(params, "horizontal_content_list") {
+		card.AddHorizontalContent(stringParam(content, "keyname"), stringParam(content, "value"), templatecard.HorizontalContentTypeText)
 	}
 
-	for _, jump := range getMapSliceParam(params, "jump_list") {
-		card.AddJump(templatecard.JumpTypeURL, getStringParam(jump, "title"), getStringParam(jump, "url"))
+	for _, jump := range mapSliceParam(params, "jump_list") {
+		card.AddJump(templatecard.JumpTypeURL, stringParam(jump, "title"), stringParam(jump, "url"))
 	}
 
 	actionURL, err := parseCardActionURL(params)
@@ -268,18 +268,18 @@ func handleSendNewsNoticeCard(client any, params map[string]any) (string, error)
 		return "", err
 	}
 
-	mainTitle := getStringParam(params, "main_title")
+	mainTitle := stringParam(params, "main_title")
 	if mainTitle == "" {
 		return "", fmt.Errorf("main_title is required")
 	}
 
-	cardImageURL := getStringParam(params, "card_image_url")
+	cardImageURL := stringParam(params, "card_image_url")
 	if cardImageURL == "" {
 		return "", fmt.Errorf("card_image_url is required")
 	}
 
 	card := templatecard.NewNewsNotice().
-		WithMainTitle(mainTitle, getStringParam(params, "main_title_desc")).
+		WithMainTitle(mainTitle, stringParam(params, "main_title_desc")).
 		WithCardImage(cardImageURL, 2.35)
 
 	if iconURL, desc, ok := parseSource(params); ok {
@@ -306,12 +306,12 @@ func handleUploadFile(client any, params map[string]any) (string, error) {
 		return "", err
 	}
 
-	filename := getStringParam(params, "filename")
+	filename := stringParam(params, "filename")
 	if filename == "" {
 		return "", fmt.Errorf("filename is required")
 	}
 
-	base64Data := getStringParam(params, "base64_data")
+	base64Data := stringParam(params, "base64_data")
 	if base64Data == "" {
 		return "", fmt.Errorf("base64_data is required")
 	}

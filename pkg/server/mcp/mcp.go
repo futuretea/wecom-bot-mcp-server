@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"net/http"
 
+	wecombot "github.com/futuretea/go-wecom-bot"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 
-	wecombot "github.com/futuretea/go-wecom-bot"
 	"github.com/futuretea/wecom-bot-mcp-server/pkg/core/config"
 	"github.com/futuretea/wecom-bot-mcp-server/pkg/core/logging"
 	"github.com/futuretea/wecom-bot-mcp-server/pkg/core/version"
@@ -16,37 +16,29 @@ import (
 	wecomToolset "github.com/futuretea/wecom-bot-mcp-server/pkg/toolset/wecom"
 )
 
-// Configuration wraps the static configuration with additional runtime components
-type Configuration struct {
-	*config.StaticConfig
-}
-
 // Server represents the MCP server
 type Server struct {
-	configuration *Configuration
-	server        *server.MCPServer
-	enabledTools  []string
-	bot           *wecombot.Bot
+	config       *config.StaticConfig
+	server       *server.MCPServer
+	enabledTools []string
+	bot          *wecombot.Bot
 }
 
 // NewServer creates a new MCP server with the given configuration
-func NewServer(configuration Configuration) (*Server, error) {
-	var serverOptions []server.ServerOption
-
-	// Configure server capabilities
-	serverOptions = append(serverOptions,
+func NewServer(cfg *config.StaticConfig) (*Server, error) {
+	serverOptions := []server.ServerOption{
 		server.WithToolCapabilities(true),
 		server.WithLogging(),
-	)
+	}
 
 	// Initialize WeCom bot client
-	bot := wecombot.New(configuration.WeComBotKey)
+	bot := wecombot.New(cfg.WeComBotKey)
 	logging.Info("WeCom bot client initialized")
 
 	s := &Server{
-		configuration: &configuration,
-		server:        server.NewMCPServer(version.BinaryName, version.Version, serverOptions...),
-		bot:           bot,
+		config: cfg,
+		server: server.NewMCPServer(version.BinaryName, version.Version, serverOptions...),
+		bot:    bot,
 	}
 
 	// Register tools
@@ -59,18 +51,15 @@ func NewServer(configuration Configuration) (*Server, error) {
 
 // registerTools registers all available tools based on configuration
 func (s *Server) registerTools() error {
-	// Initialize toolsets
-	wecomTs := &wecomToolset.Toolset{}
+	wecomToolset := &wecomToolset.Toolset{}
+	tools := wecomToolset.GetTools(s.bot)
 
-	// Get tools from the toolset
-	tools := wecomTs.GetTools(s.bot)
-
-	// Register tools based on configuration
 	for _, tool := range tools {
-		if s.shouldEnableTool(tool.Tool.Name) {
-			if err := s.registerTool(tool); err != nil {
-				return fmt.Errorf("failed to register tool %s: %w", tool.Tool.Name, err)
-			}
+		if !s.isToolEnabled(tool.Tool.Name) {
+			continue
+		}
+		if err := s.registerTool(tool); err != nil {
+			return fmt.Errorf("failed to register tool %s: %w", tool.Tool.Name, err)
 		}
 	}
 
@@ -78,52 +67,57 @@ func (s *Server) registerTools() error {
 	return nil
 }
 
-// shouldEnableTool determines if a tool should be enabled based on configuration
-func (s *Server) shouldEnableTool(toolName string) bool {
-	// Check if tool is explicitly disabled
-	for _, disabledTool := range s.configuration.DisabledTools {
-		if disabledTool == toolName {
+// isToolEnabled determines if a tool should be enabled based on configuration
+func (s *Server) isToolEnabled(toolName string) bool {
+	// Explicitly disabled tools take highest priority
+	for _, disabled := range s.config.DisabledTools {
+		if disabled == toolName {
 			return false
 		}
 	}
 
-	// Check if tool is explicitly enabled
-	if len(s.configuration.EnabledTools) > 0 {
-		for _, enabledTool := range s.configuration.EnabledTools {
-			if enabledTool == toolName {
-				return true
-			}
-		}
-		// If enabled tools are specified and this tool is not in the list, disable it
-		return false
+	// If no enabled tools specified, all non-disabled tools are enabled
+	if len(s.config.EnabledTools) == 0 {
+		return true
 	}
 
-	// Default: enable the tool
-	return true
+	// Tool must be in the enabled list
+	for _, enabled := range s.config.EnabledTools {
+		if enabled == toolName {
+			return true
+		}
+	}
+	return false
 }
 
 // registerTool registers a single tool with the MCP server
 func (s *Server) registerTool(tool toolset.ServerTool) error {
-	bot := s.bot
-
-	toolHandler := server.ToolHandlerFunc(func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-		logging.Debug("Tool %s called with params: %v", tool.Tool.Name, request.Params.Arguments)
-
-		params, _ := request.Params.Arguments.(map[string]any)
-		if params == nil {
-			params = make(map[string]any)
-		}
-
-		result, err := tool.Handler(bot, params)
-		return NewTextResult(result, err), nil
-	})
-
-	// Register tool with the MCP server
-	s.server.AddTool(tool.Tool, toolHandler)
+	handler := s.createToolHandler(tool)
+	s.server.AddTool(tool.Tool, handler)
 	s.enabledTools = append(s.enabledTools, tool.Tool.Name)
 
 	logging.Info("Registered tool: %s", tool.Tool.Name)
 	return nil
+}
+
+// createToolHandler creates the handler function for a tool
+func (s *Server) createToolHandler(tool toolset.ServerTool) server.ToolHandlerFunc {
+	return func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		logging.Debug("Tool %s called with params: %v", tool.Tool.Name, request.Params.Arguments)
+
+		params := extractParams(request.Params.Arguments)
+		result, err := tool.Handler(s.bot, params)
+		return NewTextResult(result, err), nil
+	}
+}
+
+// extractParams extracts the parameters map from the request arguments
+func extractParams(args any) map[string]any {
+	params, ok := args.(map[string]any)
+	if !ok {
+		return make(map[string]any)
+	}
+	return params
 }
 
 // ServeStdio starts the MCP server in stdio mode
@@ -139,7 +133,6 @@ func (s *Server) ServeSse(baseURL string, httpServer *http.Server) *server.SSESe
 	options := []server.SSEOption{
 		server.WithHTTPServer(httpServer),
 	}
-
 	if baseURL != "" {
 		options = append(options, server.WithBaseURL(baseURL))
 	}

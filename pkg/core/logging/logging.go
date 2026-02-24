@@ -40,16 +40,18 @@ func Initialize(level int, output io.Writer) {
 
 	// Map our log level (0-9) to zerolog levels
 	// 0-1: Error, 2-3: Warn, 4-5: Info, 6+: Debug/Trace
-	var zerologLevel zerolog.Level
-	switch {
-	case level >= 6:
-		zerologLevel = zerolog.DebugLevel
-	case level >= 4:
-		zerologLevel = zerolog.InfoLevel
-	case level >= 2:
-		zerologLevel = zerolog.WarnLevel
-	default:
-		zerologLevel = zerolog.ErrorLevel
+	levelMap := []zerolog.Level{
+		zerolog.ErrorLevel, // 0
+		zerolog.ErrorLevel, // 1
+		zerolog.WarnLevel,  // 2
+		zerolog.WarnLevel,  // 3
+		zerolog.InfoLevel,  // 4
+		zerolog.InfoLevel,  // 5
+	}
+
+	zerologLevel := zerolog.DebugLevel
+	if level < len(levelMap) {
+		zerologLevel = levelMap[level]
 	}
 
 	zerolog.SetGlobalLevel(zerologLevel)
@@ -82,6 +84,6 @@ func Fatal(format string, v ...any) {
 }
 
 // GetLogger returns the global zerolog logger for advanced usage
-func GetLogger() *zerolog.Logger {
-	return &log.Logger
+func GetLogger() zerolog.Logger {
+	return log.Logger
 }
